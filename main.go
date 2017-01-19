@@ -1,8 +1,9 @@
 package main
 
 import (
-	"flag"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os/exec"
 	"strings"
 	"time"
@@ -15,17 +16,18 @@ import (
 	"os"
 )
 
-var repo = flag.String("r", "", "The git repo to clone and analyse, e.g. https://github.com/a-h/ver")
-
 func main() {
-	flag.Parse()
 
-	if *repo == "" {
-		fmt.Println("Please provide a repo with the -r parameter.")
-		os.Exit(-1)
+	input, err := ioutil.ReadAll(os.Stdin)
+	if err != nil {
+		log.Fatal("Unable to read standard input:", err)
+	}
+	repo := string(input)
+	if len(input) == 0 {
+		log.Fatalln("A Github URL is required")
 	}
 
-	gitRepo, err := git.Clone(*repo)
+	gitRepo, err := git.Clone(repo)
 	defer gitRepo.CleanUp()
 
 	if err != nil {
@@ -38,7 +40,7 @@ func main() {
 		os.Exit(-1)
 	}
 
-	fmt.Printf("Cloned repo %s into %s\n", *repo, gitRepo.PackageDirectory())
+	fmt.Printf("Cloned repo %s into %s\n", repo, gitRepo.PackageDirectory())
 
 	history, err := gitRepo.Log()
 
