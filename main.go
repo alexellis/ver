@@ -16,13 +16,18 @@ import (
 	"os"
 )
 
+func sanitizeInput(input string) string {
+        parts := strings.Split(input, "\n")
+            return strings.Trim(parts[0], " ")
+        }
+
 func main() {
 
 	input, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		log.Fatal("Unable to read standard input:", err)
 	}
-	repo := string(input)
+	repo := sanitizeInput(string(input))
 	if len(input) == 0 {
 		log.Fatalln("A Github URL is required")
 	}
